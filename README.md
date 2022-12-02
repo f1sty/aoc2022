@@ -1,21 +1,5 @@
-# Aoc2022
+# aoc2022
 
-**TODO: Add description**
+Thus are my [aoc2022](https://adventofcode.com/) solutions.
 
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `aoc2022` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:aoc2022, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/aoc2022>.
-
+Each day solution is in separate module, common functions are stored in `Aoc2022` module.
