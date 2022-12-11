@@ -7,12 +7,17 @@ dir d
 $ cd a
 $ ls
 dir e
+dir b
 29116 f
 2557 g
 62596 h.lst
 $ cd e
 $ ls
 584 i
+$ cd ..
+$ cd b
+$ ls
+1000 file
 $ cd ..
 $ cd ..
 $ cd d
