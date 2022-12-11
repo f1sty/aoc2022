@@ -4,8 +4,8 @@ defmodule Aoc2022.Day8 do
     |> Aoc2022.read_puzzle_input()
     |> parse()
     |> scan_forest(&tallest?/5)
-    |> then(fn {edge_trees_qty, trees} ->
-      Enum.count(trees, fn visible -> visible end) + edge_trees_qty
+    |> then(fn {trees_visibilities, edge_trees_qty} ->
+      Enum.count(trees_visibilities, fn visible -> visible end) + edge_trees_qty
     end)
   end
 
@@ -14,7 +14,7 @@ defmodule Aoc2022.Day8 do
     |> Aoc2022.read_puzzle_input()
     |> parse()
     |> scan_forest(&scenic_scores/5)
-    |> elem(1)
+    |> elem(0)
     |> Enum.max()
   end
 
@@ -40,17 +40,21 @@ defmodule Aoc2022.Day8 do
     [width, height] = Enum.map([rows, columns], &(hd(&1) |> length()))
     edge_trees_qty = 2 * (width + height) - 4
 
-    ret =
+    payload =
       for y <- 1..(height - 2), x <- 1..(width - 2) do
         tree_height = columns |> Enum.at(x) |> Enum.at(y)
 
         {left, [_ | right]} = rows |> Enum.at(y) |> Enum.split(x)
         {up, [_ | down]} = columns |> Enum.at(x) |> Enum.split(y)
 
+        # reverse `left` and `up` because direction matters on part 2
+        left = Enum.reverse(left)
+        up = Enum.reverse(up)
+
         fun.(tree_height, left, right, up, down)
       end
 
-    {edge_trees_qty, ret}
+    {payload, edge_trees_qty}
   end
 
   defp tallest?(height, left, right, up, down) do
@@ -59,21 +63,14 @@ defmodule Aoc2022.Day8 do
   end
 
   defp scenic_scores(height, left, right, up, down) do
-    left = visible_qty(left, height, :left)
-    right = visible_qty(right, height, :right)
-    up = visible_qty(up, height, :up)
-    down = visible_qty(down, height, :down)
-
-    left * right * up * down
+    Enum.map([left, right, up, down], &visible_qty(&1, height)) |> Enum.product()
   end
 
-  defp visible_qty(trees, height, direction) do
-    trees = if direction in ~w"left up"a, do: Enum.reverse(trees), else: trees
-
-    trees
+  defp visible_qty(forest, height) do
+    forest
     |> Enum.find_index(&(&1 >= height))
     |> then(fn
-      nil -> length(trees)
+      nil -> length(forest)
       idx -> idx + 1
     end)
   end
