@@ -1,4 +1,5 @@
 defmodule Aoc2022.Day5 do
+  @moduledoc false
   def part1() do
     {stacks, moves} = parse_input("day5")
 

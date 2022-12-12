@@ -1,4 +1,5 @@
 defmodule Aoc2022.Day8 do
+  @moduledoc false
   def part1() do
     "day8"
     |> Aoc2022.read_puzzle_input()

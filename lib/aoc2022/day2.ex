@@ -1,4 +1,5 @@
 defmodule Aoc2022.Day2 do
+  @moduledoc false
   @win_combinations Enum.zip(1..3, [2, 3, 1])
   @lose_combinations Enum.zip(1..3, [3, 1, 2])
 

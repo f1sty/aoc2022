@@ -1,4 +1,5 @@
 defmodule Aoc2022.Day4 do
+  @moduledoc false
   def part1() do
     solving_fun = fn first_set, second_set ->
       MapSet.subset?(first_set, second_set) or MapSet.subset?(second_set, first_set)

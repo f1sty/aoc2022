@@ -1,4 +1,5 @@
 defmodule Aoc2022.Day6 do
+  @moduledoc false
   @sizes %{sop: 4, som: 14}
 
   def part1() do

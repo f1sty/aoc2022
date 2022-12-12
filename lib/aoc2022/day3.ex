@@ -1,4 +1,5 @@
 defmodule Aoc2022.Day3 do
+  @moduledoc false
   def part1() do
     priority_map = priority_map()
 

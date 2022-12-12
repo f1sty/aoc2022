@@ -3,7 +3,7 @@ defmodule Aoc2022.Day1Test do
   alias Aoc2022.Day1
 
   test "solving part 1" do
-    assert Day1.part1() == 71023
+    assert Day1.part1() == 71_023
   end
 
   test "solving part 2" do

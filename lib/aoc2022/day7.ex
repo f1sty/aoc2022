@@ -1,8 +1,11 @@
 defmodule Dir do
+  @moduledoc false
   defstruct files: [], dirs: []
 end
 
 defmodule Aoc2022.Day7 do
+  @moduledoc false
+
   @total_space 70_000_000
   @space_needed 30_000_000
 
@@ -12,7 +15,6 @@ defmodule Aoc2022.Day7 do
     |> String.split("\n", trim: true)
     |> process_input()
     |> then(&Enum.map(&1, fn {path, dir} -> {path, dir_size(dir, &1, 0)} end))
-    |> IO.inspect(label: "dirs")
     |> Enum.filter(fn {_path, size} -> size <= 100_000 end)
     |> Enum.reduce(0, fn {_path, size}, sum -> sum + size end)
   end
