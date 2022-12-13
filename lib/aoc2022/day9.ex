@@ -1,57 +1,87 @@
 defmodule Aoc2022.Day9 do
   @moduledoc false
 
+  @knotes 9
+
+  @type coordinates :: {integer(), integer()}
+
   def part1() do
     "day9"
     |> Aoc2022.read_puzzle_input()
-    |> parse()
+    |> input_to_motions()
+    |> motions_to_coordinates_list()
+    |> tails_coordinates_list()
+    |> Enum.uniq()
     |> Enum.count()
   end
 
-  def parse(input) do
+  def part2() do
+    "day9"
+    |> Aoc2022.read_puzzle_input()
+    |> input_to_motions()
+    |> motions_to_coordinates_list()
+    |> then(
+      &Enum.reduce(1..@knotes, &1, fn _tail_nummber, tail_coordinates_list ->
+        tails_coordinates_list(tail_coordinates_list)
+      end)
+    )
+    |> Enum.uniq()
+    |> Enum.count()
+  end
+
+  @spec input_to_motions(String.t()) :: list()
+  def input_to_motions(input) do
     input
     |> String.split("\n", trim: true)
-    |> simulate()
-  end
-
-  def simulate(head_moves) do
-    head_moves
-    |> Enum.reduce({{0, 0}, :queue.new()}, fn instruction, {head_pos, head_route} ->
-      [direction, steps] = String.split(instruction, " ", trim: true)
-      steps = String.to_integer(steps)
-      head_route = move_head(direction, steps, head_pos, head_route)
-      head_pos = :queue.last(head_route)
-
-      {head_pos, head_route}
+    |> Enum.reduce([], fn instruction, instructions ->
+      case instruction do
+        "R " <> steps -> List.duplicate(:right, String.to_integer(steps)) ++ instructions
+        "L " <> steps -> List.duplicate(:left, String.to_integer(steps)) ++ instructions
+        "U " <> steps -> List.duplicate(:up, String.to_integer(steps)) ++ instructions
+        "D " <> steps -> List.duplicate(:down, String.to_integer(steps)) ++ instructions
+      end
     end)
-    |> move_tail({0, 0}, %{})
+    |> Enum.reverse()
   end
 
-  def move_head("R", steps, {x, y}, route),
-    do: Enum.reduce((x + 1)..(x + steps), route, fn dx, route -> :queue.in({dx, y}, route) end)
-
-  def move_head("L", steps, {x, y}, route),
-    do: Enum.reduce((x - 1)..(x - steps), route, fn dx, route -> :queue.in({dx, y}, route) end)
-
-  def move_head("U", steps, {x, y}, route),
-    do: Enum.reduce((y + 1)..(y + steps), route, fn dy, route -> :queue.in({x, dy}, route) end)
-
-  def move_head("D", steps, {x, y}, route),
-    do: Enum.reduce((y - 1)..(y - steps), route, fn dy, route -> :queue.in({x, dy}, route) end)
-
-  def move_tail({_, head_route}, tail_pos, tail_route) do
-    case :queue.out(head_route) do
-      {{:value, head_pos}, head_route} ->
-        tail_pos = maybe_move_tail(tail_pos, head_pos)
-        tail_route = Map.update(tail_route, tail_pos, 1, &(&1 + 1))
-        move_tail({head_pos, head_route}, tail_pos, tail_route)
-
-      {:empty, _} ->
-        tail_route
-    end
+  @spec motions_to_coordinates_list(list()) :: [coordinates()]
+  def motions_to_coordinates_list(motions) do
+    motions_to_coordinates_list(motions, {0, 0}, [])
   end
 
-  def maybe_move_tail({x1, y1}, {x2, y2}) do
+  @spec motions_to_coordinates_list(list(), coordinates(), [coordinates()]) :: [coordinates()]
+  def motions_to_coordinates_list([], _coordinates, coordinates_list),
+    do: Enum.reverse(coordinates_list)
+
+  def motions_to_coordinates_list([direction | motions], {x, y}, coordinates_list) do
+    coordinates =
+      case direction do
+        :right -> {x + 1, y}
+        :left -> {x - 1, y}
+        :up -> {x, y + 1}
+        :down -> {x, y - 1}
+      end
+
+    motions_to_coordinates_list(motions, coordinates, [coordinates | coordinates_list])
+  end
+
+  @spec tails_coordinates_list([coordinates()]) :: [coordinates()]
+  def tails_coordinates_list(coordinates_list) do
+    tails_coordinates_list(coordinates_list, {0, 0}, [])
+  end
+
+  @spec tails_coordinates_list([coordinates()], coordinates(), [coordinates()]) :: [coordinates()]
+  def tails_coordinates_list([], _tail_coordinates, tail_coordinates_list),
+    do: Enum.reverse(tail_coordinates_list)
+
+  def tails_coordinates_list([head_pos | head_coordinates_list], tail_pos, tail_coordinates_list) do
+    tail_pos = maybe_move_tail(tail_pos, head_pos)
+    tail_coordinates_list = [tail_pos | tail_coordinates_list]
+
+    tails_coordinates_list(head_coordinates_list, tail_pos, tail_coordinates_list)
+  end
+
+  defp maybe_move_tail({x1, y1}, {x2, y2}) do
     adjacent = for x <- (x1 - 1)..(x1 + 1), y <- (y1 - 1)..(y1 + 1), do: {x, y}
 
     if {x2, y2} in adjacent do
